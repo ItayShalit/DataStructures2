@@ -160,6 +160,7 @@ public class FibonacciHeap
     			node = node.getNext();
     		node.setNext(this.first);
     		this.first.setPrev(node);
+    		
     	}
     }
     
@@ -227,11 +228,9 @@ public class FibonacciHeap
     	boolean cutX = false;
     	while(x.getParent() != null) {
     		if ((x.getKey() < x.getParent().getKey())||cutX) {
-    			if (x.getNext() != null) {
-    				if (x.getNext() != x) //If x is not the only child of its parent.
-    					x.getParent().setChild(x.getNext()); //Update the child of x's parent to be x's next node.
-    				x.getNext().setPrev(x.getPrev());
-    			}
+				if (x.getNext() != x) //If x is not the only child of its parent.
+					x.getParent().setChild(x.getNext()); //Update the child of x's parent to be x's next node.
+				x.getNext().setPrev(x.getPrev());
     			if (x.getPrev() != null) {
     				x.getPrev().setNext(x.getNext());
     			}
@@ -304,10 +303,28 @@ public class FibonacciHeap
     * The function should run in O(k*deg(H)). (deg(H) is the degree of the only tree in H.)
     *  
     * ###CRITICAL### : you are NOT allowed to change H. 
+    * 
+    * k <= n = theta(deg(H)) in a binomial tree.
     */
     public static int[] kMin(FibonacciHeap H, int k)
-    {    
-        int[] arr = new int[100];
+    {   
+    	FibonacciHeap waitingItems = new FibonacciHeap();
+        int[] arr = new int[k];
+        HeapNode node = H.findMin();
+        while() {
+        	HeapNode[] nodesToWaitingList = new HeapNode[H.findMin().getRank()];
+        	int index = 0;
+        	HeapNode minKeyNode = node.getKey();
+        	while() {
+        		
+        	}
+        	
+    }
+        
+        
+        
+        /*continue according to theoretical implementation.
+        
         return arr; // should be replaced by student code
     }
     
@@ -393,4 +410,5 @@ public class FibonacciHeap
     	}
     	
     }
+  }
 }
