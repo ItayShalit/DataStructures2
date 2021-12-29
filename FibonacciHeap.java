@@ -21,9 +21,7 @@ public class FibonacciHeap
      */
     public boolean isEmpty()
     {
-        if (this.first == null)
-            return true;
-        return false;
+        return this.first == null;
     }
 
     /**
@@ -50,15 +48,24 @@ public class FibonacciHeap
      */
     public void insertNode(HeapNode node)
     {
-        HeapNode lastnode = this.first.getPrev(); // last node in the first row of roots
-        //changes the pointers to make node the first one
-        lastnode.setNext(node);
-        node.setNext(this.first);
-        node.setPrev(lastnode);
-        first.setPrev(node);
-        this.first = node;
-        if(node.getKey() < this.min.getKey())// updates the min if necessary
-            this.min = node;
+        if (isEmpty())
+        {
+            this.first = node;
+            node.setNext(node);
+            node.setPrev(node);
+        }
+        else
+        {
+            HeapNode lastnode = this.first.getPrev(); // last node in the first row of roots
+            //changes the pointers to make node the first one
+            lastnode.setNext(node);
+            node.setNext(this.first);
+            node.setPrev(lastnode);
+            first.setPrev(node);
+            this.first = node;
+            if (node.getKey() < this.min.getKey())// updates the min if necessary
+                this.min = node;
+        }
     }
 
     /**
@@ -71,8 +78,9 @@ public class FibonacciHeap
     {
         HeapNode child = this.min.getChild();
         if (child != null) { //Adding the children of this.min to the series of roots, instead of this.min.
-            HeapNode lastChild = child;
-            while(lastChild.getNext() != child) {
+            HeapNode lastChild = child.getPrev();
+            while(lastChild.getNext() != child)
+            {
                 lastChild = lastChild.getNext();
             }
             if (this.min.getPrev() != null)
@@ -226,16 +234,32 @@ public class FibonacciHeap
      * It is assumed that x indeed belongs to the heap.
      *
      */
+
+    public void cascadingCuts(HeapNode x, boolean cutX)
+    {
+
+    }
+
+
     public void delete(HeapNode x)
     {
-        x.getParent().setRank(x.getParent().getRank() -1); //reduces x's parent's rank by 1 because it lost a child
+        x.getParent().setRank(x.getParent().getRank() -1);   //reduces x's parent's rank by 1 because it lost a child
         if(x.getKey() != this.min.getKey())
         {
             int a = x.getKey() - this.min.getKey() + 1; // the difference between x's value and the minimum value + 1
             decreaseKey(x,a); //guarantees x will be the new minimum
         }
+        if(!x.getParent().getMark())
+            x.getParent().setMark(true);
         deleteMin();
     }
+
+
+    public void turn_node_to_root(HeapNode node)
+    {
+
+    }
+
 
     /**
      * public void decreaseKey(HeapNode x, int delta)
@@ -243,6 +267,7 @@ public class FibonacciHeap
      * Decreases the key of the node x by a non-negative value delta. The structure of the heap should be updated
      * to reflect this change (for example, the cascading cuts procedure should be applied if needed).
      */
+
     public void decreaseKey(HeapNode x, int delta)
     {
         x.setKey(x.getKey() - delta);
@@ -294,7 +319,7 @@ public class FibonacciHeap
      */
     public int potential()
     {
-        return -234; // should be replaced by student code
+        return (TotalTrees - 2*TotalMarks); // should be replaced by student code
     }
 
     /**
@@ -332,10 +357,48 @@ public class FibonacciHeap
      */
     public static int[] kMin(FibonacciHeap H, int k)
     {
-        int[] arr = new int[100];
-        return arr; // should be replaced by student code
+        int[] arr = new int[k];
+        arr[0] = H.getFirst().getKey();
+        int i = 1;
+        boolean first_time_in_a_row1 = true;
+        boolean first_time_in_a_row2 = true;
+        HeapNode node = H.first.getChild();
+        while(i <= k)
+        {
+            HeapNode node2 = node.getChild(); // go one row down
+            // finds the minimum of the two rows
+            if(first_time_in_a_row1) {
+                node = find_relative_min(node, null);
+                first_time_in_a_row1 = false;
+            }
+            else
+
+            if(first_time_in_a_row2) {
+                node2 = find_relative_min(node2, null);
+            }
+
+            // add the minimum between them
+            arr[i] = Math.min(node.getKey(), node2.getKey());
+
+            i++;
+        }
+        return arr;
     }
 
+    public static HeapNode find_relative_min(HeapNode node,HeapNode node2)
+    // finds the minimum key bigger than node2 in a tree level
+    {
+        HeapNode min = node;
+        if(node2 != null)
+            min = node2;
+        while(node.getNext()!= null)
+        {
+            node = node.getNext();
+            if (node.getKey() < min.getKey())
+                min = node;
+        }
+        return min;
+    }
     public HeapNode getFirst() {
         return this.first;
     }
