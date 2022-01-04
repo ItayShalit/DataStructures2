@@ -1,3 +1,5 @@
+
+
 /**
  * FibonacciHeap
  *
@@ -103,9 +105,7 @@ public class FibonacciHeap
      */
     public boolean isEmpty()
     {
-        if (this.first == null)
-            return true;
-        return false;
+        return this.first == null;
     }
 
     /**
@@ -470,6 +470,8 @@ public class FibonacciHeap
      */
     public int potential()
     {
+        System.out.println(TotalTrees + " Trees" );
+        System.out.println(TotalMarks + " Marks");
         return (TotalTrees - 2*TotalMarks); // should be replaced by student code
     }
 
@@ -508,8 +510,52 @@ public class FibonacciHeap
      */
     public static int[] kMin(FibonacciHeap H, int k)
     {
-        int[] arr = new int[100];
-        return arr; // should be replaced by student code
+        int[] arr = new int[k];
+        if (!H.isEmpty())
+        {
+            boolean went_down = true; // checks if we went down to a new level of siblings
+            FibonacciHeap temp_heap = new FibonacciHeap(); // the temporary heap to manipulate
+            int i = 0;
+            HeapNode pointer = H.getFirst();
+            HeapNode run_pointer = pointer;
+
+            while (i < k)
+            {
+                if(went_down) // if the previous minimum had children
+                {
+                    do// inserting all the brothers to find the minimum, do once in case of a single child
+                    {
+                        temp_heap.insert(run_pointer.getKey());
+                        run_pointer = run_pointer.getNext();
+                    }
+                    while (run_pointer.getKey() != pointer.getKey());
+
+                }
+                arr[i] = temp_heap.getMin().getKey();
+                HeapNode run_pointer_check = run_pointer;
+                while(run_pointer.getKey() != temp_heap.getMin().getKey())
+                {
+                    run_pointer = run_pointer.getNext();
+                    if(run_pointer_check == run_pointer) {
+                        run_pointer = run_pointer.getParent();
+                        run_pointer_check = run_pointer_check.getParent();
+                    }
+                }
+                pointer = run_pointer.getChild();
+                if(pointer == null)
+                {
+                    pointer = run_pointer;
+                    went_down = false;
+                }
+                else {
+                    run_pointer = pointer;
+                    went_down = true;
+                }
+                temp_heap.deleteMin();
+                i++;
+            }
+        }
+        return arr;
     }
 
     public HeapNode getFirst() {
