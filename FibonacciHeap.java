@@ -12,7 +12,7 @@ public class FibonacciHeap
     private static int totalLinksCounter = 0;
     private static int totalCutsCounter = 0;
     private int TotalMarks = 0;
-    private int TotalTrees = 0;
+    public int TotalTrees = 0;
     private int size = 0;
     
     /**
@@ -470,8 +470,6 @@ public class FibonacciHeap
      */
     public int potential()
     {
-        System.out.println(TotalTrees + " Trees" );
-        System.out.println(TotalMarks + " Marks");
         return (TotalTrees - 2*TotalMarks); // should be replaced by student code
     }
 
@@ -533,7 +531,7 @@ public class FibonacciHeap
                 }
                 arr[i] = temp_heap.getMin().getKey();
                 HeapNode run_pointer_check = run_pointer;
-                while(run_pointer.getKey() != temp_heap.getMin().getKey())
+                while(run_pointer.getKey() != temp_heap.getMin().getKey()) // going up to find the minimum
                 {
                     run_pointer = run_pointer.getNext();
                     if(run_pointer_check == run_pointer) {
