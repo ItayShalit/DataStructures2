@@ -1,5 +1,3 @@
-
-
 /**
  * FibonacciHeap
  *
@@ -12,7 +10,7 @@ public class FibonacciHeap
     private static int totalLinksCounter = 0;
     private static int totalCutsCounter = 0;
     private int TotalMarks = 0;
-    private int TotalTrees = 0;
+    public int TotalTrees = 0;
     private int size = 0;
     
     /**
@@ -132,6 +130,7 @@ public class FibonacciHeap
      */
     public void insertNode(HeapNode node)
     {
+    	node.setParent(null);
         if (isEmpty())
         {
             this.first = node;
@@ -197,7 +196,7 @@ public class FibonacciHeap
 		        }
 	        }
 	        this.size --;
-	        successiveLinking(); //Also updates minimum	        
+	        successiveLinking(); //Also updates minimum	and totalTrees     
     	}
     }
 
@@ -217,9 +216,8 @@ public class FibonacciHeap
 	    		if (node.getRank() > maxRank)
 	    			maxRank = node.getRank();
 	    	}
-	    	HeapNode[] buckets = new HeapNode[maxRank + numOfTrees];
-	    	node = this.first.getPrev();
-	    	HeapNode nextNode = node.getNext();
+	    	HeapNode[] buckets = new HeapNode[maxRank + numOfTrees + 1];
+	    	HeapNode nextNode = this.first;
 	    	do { //Starting from the first root node, and iterating until the last, while performing successive linking.
 	    		node = nextNode;
 	    		nextNode = node.getNext();
@@ -230,7 +228,7 @@ public class FibonacciHeap
 	    		}
 	    		buckets[node.getRank()] = node;   
 	    	}
-	    	while(nextNode != first);
+	    	while(nextNode != this.first);
 	    	int minBucketWithNode = buckets.length - 1;
 	    	for(int i = 0; i < buckets.length; i++) { //Finding the index of minimal bucket that has a node in it.
 	    											  //We assume buckets isn't empty, because of the pre - condition.
@@ -248,10 +246,9 @@ public class FibonacciHeap
 	    		                                                           //and updates the heap fields.
 	    		if (buckets[i] != null) {
 	    			first.getPrev().setNext(buckets[i]);
-	    			buckets[i].setPrev(first.getPrev());
+	    			buckets[i].setPrev(first.getPrev());	    			
 	    			first.setPrev(buckets[i]);
 	    			buckets[i].setNext(first);
-	    			first = buckets[i];
 	    			if (buckets[i].getKey() < this.min.getKey())
 	    				this.min = buckets[i];
 	    			this.TotalTrees++;
@@ -325,24 +322,22 @@ public class FibonacciHeap
     public void meld (FibonacciHeap heap2)
     {
         if (this.isEmpty()) {
-            this.first = heap2.first;
-            this.min = heap2.min;
+            this.first = heap2.getFirst();
+            this.min = heap2.getMin();
         }
         else if(!(heap2.isEmpty())){
         	if (this.min.getKey() > heap2.getMin().getKey()) //We assume no duplicates
         		this.min = heap2.getMin();
-            HeapNode node = this.first.getPrev(); //The last root node of this heap.
-            node.setNext(heap2.getFirst());
-            heap2.getFirst().setPrev(node);
-            node = heap2.getFirst().getPrev(); //The last root node of this heap.
-            node.setNext(this.first);
-            this.first.setPrev(node);
+            HeapNode lastThisNode = this.first.getPrev(); //The last root node of this heap.
+            lastThisNode.setNext(heap2.getFirst());
+            HeapNode lastOtherNode = heap2.getFirst().getPrev(); //The last root node of the other heap.
+            heap2.getFirst().setPrev(lastThisNode);
+            lastOtherNode.setNext(this.first);
+            this.first.setPrev(lastOtherNode);
         }
         this.TotalTrees = this.TotalTrees + heap2.TotalTrees;
         this.TotalMarks = this.TotalMarks + heap2.TotalMarks;
     }
-    
-
 
     /**
      * public int size()
@@ -470,8 +465,6 @@ public class FibonacciHeap
      */
     public int potential()
     {
-        System.out.println(TotalTrees + " Trees" );
-        System.out.println(TotalMarks + " Marks");
         return (TotalTrees - 2*TotalMarks); // should be replaced by student code
     }
 
@@ -533,7 +526,7 @@ public class FibonacciHeap
                 }
                 arr[i] = temp_heap.getMin().getKey();
                 HeapNode run_pointer_check = run_pointer;
-                while(run_pointer.getKey() != temp_heap.getMin().getKey())
+                while(run_pointer.getKey() != temp_heap.getMin().getKey()) // going up to find the minimum
                 {
                     run_pointer = run_pointer.getNext();
                     if(run_pointer_check == run_pointer) {
